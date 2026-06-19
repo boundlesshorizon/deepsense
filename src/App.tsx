@@ -66,7 +66,13 @@ export default function App() {
         body: formData,
       });
 
-      const data = await response.json();
+      const textResponse = await response.text();
+      let data;
+      try {
+        data = JSON.parse(textResponse);
+      } catch (e) {
+        throw new Error(`Server returned an invalid response (not JSON): \${textResponse.slice(0, 100)}...`);
+      }
 
       if (!response.ok) {
         throw new Error(data.error || 'Analysis failed');
