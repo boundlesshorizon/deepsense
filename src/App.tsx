@@ -32,7 +32,7 @@ export default function App() {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ 
     onDrop,
     maxFiles: 1,
-    maxSize: 20 * 1024 * 1024, // 20 MB max
+    maxSize: 5 * 1024 * 1024, // 5 MB max
   });
 
   const runAnalysis = async () => {
@@ -71,6 +71,9 @@ export default function App() {
       try {
         data = JSON.parse(textResponse);
       } catch (e) {
+        if (textResponse.includes("NOT_FOUND")) {
+           throw new Error("Proxy connection failed. The request timed out or the file was too large. Try scaling down the media size.");
+        }
         throw new Error(`Server returned an invalid response (not JSON): ${textResponse.slice(0, 100)}...`);
       }
 
@@ -169,7 +172,7 @@ export default function App() {
                   Drag & drop media here
                 </p>
                 <p className="text-xs text-[#71717a] mt-1 text-center">
-                  Supports Images, Audio, Video (Max 20MB)
+                  Supports Images, Audio, Video (Max 5MB)
                 </p>
               </div>
 
