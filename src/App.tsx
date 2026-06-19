@@ -29,10 +29,18 @@ export default function App() {
     }
   }, []);
 
+  const onDropRejected = useCallback((fileRejections: any[]) => {
+    if (fileRejections.length > 0) {
+      const errorStr = fileRejections[0].errors.map((e: any) => e.message).join(', ');
+      setError(`File rejected: ${errorStr} (Max size is 3MB)`);
+    }
+  }, []);
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ 
     onDrop,
+    onDropRejected,
     maxFiles: 1,
-    maxSize: 4 * 1024 * 1024, // 4 MB max to avoid proxy limits
+    maxSize: 3 * 1024 * 1024, // 3 MB max to avoid Vercel edge proxy limits
   });
 
   const runAnalysis = async () => {
@@ -45,8 +53,8 @@ export default function App() {
       return;
     }
     
-    if (textInput.length > 500000) { // Approx 500kb chars
-      setError("Text is too long. Please shorten your input to avoid timeout limits.");
+    if (textInput.length > 300000) { // 300kb chars
+      setError("Text is too long. Please limit to ~300,000 characters to avoid network limits.");
       return;
     }
 
@@ -174,7 +182,7 @@ export default function App() {
                   Drag & drop media here
                 </p>
                 <p className="text-xs text-[#71717a] mt-1 text-center">
-                  Supports Images, Audio, Video (Max 5MB)
+                  Supports Images, Audio, Video (Max 3.0 MB)
                 </p>
               </div>
 

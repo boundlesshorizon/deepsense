@@ -31,8 +31,8 @@ function getAI() {
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { 
-    fileSize: 20 * 1024 * 1024, // 20 MB max file size
-    fieldSize: 20 * 1024 * 1024 // 20 MB max text size
+    fileSize: 3 * 1024 * 1024, // 3 MB max file size
+    fieldSize: 3 * 1024 * 1024 // 3 MB max text size
   }
 });
 
