@@ -61,7 +61,7 @@ export default function App() {
         formData.append('media', file);
       }
 
-      const response = await fetch('/app-api/analyze', {
+      const response = await fetch('/api/analyze', {
         method: 'POST',
         body: formData,
       });

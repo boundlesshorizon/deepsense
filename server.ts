@@ -30,7 +30,10 @@ function getAI() {
 // Use memory storage for fast conversion to inlineData
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 20 * 1024 * 1024 } // 20 MB max file size
+  limits: { 
+    fileSize: 20 * 1024 * 1024, // 20 MB max file size
+    fieldSize: 20 * 1024 * 1024 // 20 MB max text size
+  }
 });
 
 const FORENSIC_SYSTEM_PROMPT = `
@@ -85,7 +88,8 @@ A concise, 2-3 sentence executive summary explaining the definitive reasons behi
 
 app.use(express.json());
 
-app.post('/app-api/analyze', upload.single('media'), async (req, res) => {
+app.post('/api/analyze', upload.single('media'), async (req, res) => {
+  console.log(`[API] Received analyze request - type: ${req.body.type}, file: ${req.file ? 'yes' : 'no'}`);
   try {
     const isTextMode = req.body.type === 'text';
     
@@ -133,7 +137,7 @@ app.post('/app-api/analyze', upload.single('media'), async (req, res) => {
 });
 
 // Generic API error handler to prevent HTML responses
-app.use('/app-api', (err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+app.use('/api', (err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error('API Error:', err);
   if (!res.headersSent) {
     res.status(500).json({ error: err.message || 'Internal Server Error' });
