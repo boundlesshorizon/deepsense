@@ -6,17 +6,26 @@ import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI } from '@google/genai';
 import "dotenv/config";
 
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY,
-  httpOptions: {
-    headers: {
-      'User-Agent': 'aistudio-build',
-    }
-  }
-});
-
 const app = express();
 const PORT = 3000;
+
+let aiClient: GoogleGenAI | null = null;
+function getAI() {
+  if (!aiClient) {
+    if (!process.env.GEMINI_API_KEY) {
+      throw new Error("GEMINI_API_KEY environment variable is not configured. Please add it to the AI Studio Secrets panel.");
+    }
+    aiClient = new GoogleGenAI({
+      apiKey: process.env.GEMINI_API_KEY,
+      httpOptions: {
+        headers: {
+          'User-Agent': 'aistudio-build',
+        }
+      }
+    });
+  }
+  return aiClient;
+}
 
 // Use memory storage for fast conversion to inlineData
 const upload = multer({
@@ -107,6 +116,7 @@ app.post('/api/analyze', upload.single('media'), async (req, res) => {
       contents.push({ text: 'Please analyze this media file according to your forensic capabilities.' });
     }
 
+    const ai = getAI();
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: contents,
@@ -119,6 +129,14 @@ app.post('/api/analyze', upload.single('media'), async (req, res) => {
   } catch (error) {
     console.error('Analysis error:', error);
     res.status(500).json({ error: 'Analysis failed: ' + (error instanceof Error ? error.message : 'Unknown error') });
+  }
+});
+
+// Generic API error handler to prevent HTML responses
+app.use('/api', (err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error('API Error:', err);
+  if (!res.headersSent) {
+    res.status(500).json({ error: err.message || 'Internal Server Error' });
   }
 });
 

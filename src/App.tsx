@@ -71,7 +71,7 @@ export default function App() {
       try {
         data = JSON.parse(textResponse);
       } catch (e) {
-        throw new Error(`Server returned an invalid response (not JSON): \${textResponse.slice(0, 100)}...`);
+        throw new Error(`Server returned an invalid response (not JSON): ${textResponse.slice(0, 100)}...`);
       }
 
       if (!response.ok) {
