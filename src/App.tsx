@@ -32,7 +32,7 @@ export default function App() {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ 
     onDrop,
     maxFiles: 1,
-    maxSize: 5 * 1024 * 1024, // 5 MB max
+    maxSize: 4 * 1024 * 1024, // 4 MB max to avoid proxy limits
   });
 
   const runAnalysis = async () => {
@@ -42,6 +42,11 @@ export default function App() {
     }
     if ((mode !== 'text' && !file && !textInput.trim())) {
       setError("Please upload a file or enter text.");
+      return;
+    }
+    
+    if (textInput.length > 500000) { // Approx 500kb chars
+      setError("Text is too long. Please shorten your input to avoid timeout limits.");
       return;
     }
 
@@ -61,7 +66,7 @@ export default function App() {
         formData.append('media', file);
       }
 
-      const response = await fetch('/api/analyze', {
+      const response = await fetch('/upload-analyze', {
         method: 'POST',
         body: formData,
       });
