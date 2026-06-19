@@ -85,7 +85,7 @@ A concise, 2-3 sentence executive summary explaining the definitive reasons behi
 
 app.use(express.json());
 
-app.post('/api/analyze', upload.single('media'), async (req, res) => {
+app.post('/app-api/analyze', upload.single('media'), async (req, res) => {
   try {
     const isTextMode = req.body.type === 'text';
     
@@ -133,7 +133,7 @@ app.post('/api/analyze', upload.single('media'), async (req, res) => {
 });
 
 // Generic API error handler to prevent HTML responses
-app.use('/api', (err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+app.use('/app-api', (err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error('API Error:', err);
   if (!res.headersSent) {
     res.status(500).json({ error: err.message || 'Internal Server Error' });

@@ -61,7 +61,7 @@ export default function App() {
         formData.append('media', file);
       }
 
-      const response = await fetch('/api/analyze', {
+      const response = await fetch('/app-api/analyze', {
         method: 'POST',
         body: formData,
       });
@@ -71,10 +71,7 @@ export default function App() {
       try {
         data = JSON.parse(textResponse);
       } catch (e) {
-        if (textResponse.includes("NOT_FOUND")) {
-           throw new Error("Proxy connection failed. The request timed out or the file was too large. Try scaling down the media size.");
-        }
-        throw new Error(`Server returned an invalid response (not JSON): ${textResponse.slice(0, 100)}...`);
+        throw new Error(`Server returned an invalid response (not JSON): ${textResponse.slice(0, 500)}...`);
       }
 
       if (!response.ok) {
